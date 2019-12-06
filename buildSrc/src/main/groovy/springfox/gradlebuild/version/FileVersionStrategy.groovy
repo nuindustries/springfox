@@ -18,12 +18,13 @@ class FileVersionStrategy implements VersioningStrategy, GitTaggingSupport, GitV
     versionFile.withInputStream() { stream ->
 
       def versionLine = stream.readLines().first()
-      def (major, minor, patch) = versionLine.replace(buildNumberSuffix, "").split("\\.")
+      def values = versionLine.replace(buildNumberSuffix, "").split("\\.");
+      def (major, minor, patch, rest) = [values[0], values[1], values[2], values.length > 3 ? "." + values[3] : (isReleaseBuild ? "" : buildNumberSuffix)]
       version = new SemanticVersion(
           major.toInteger(),
           minor.toInteger(),
           patch.toInteger(),
-          isReleaseBuild ? "" : buildNumberSuffix)
+          rest)
     }
     version
   }
